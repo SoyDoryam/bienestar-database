@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: bienestar_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: bienestar_db
+      POSTGRES_USER: bienestar
+      POSTGRES_PASSWORD: Bienestar2026*
+    ports:
+      - "5433:5432"
+    volumes:
+      - bienestar_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/001_init.sql
+      - ./sp_seg.sql:/docker-entrypoint-initdb.d/002_sp_seg.sql
+
+volumes:
+  bienestar_data:

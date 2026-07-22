@@ -43,6 +43,36 @@ INSERT INTO seg.roles (rol_nombre, descripcion) VALUES
 ('CAJERO', 'Usuario cajero');
 
 -- =============================================
+-- USUARIO ADMINISTRADOR INICIAL
+-- =============================================
+
+INSERT INTO seg.usuarios
+(
+    usuario,
+    contrasena,
+    nombre,
+    apellido,
+    correo,
+    telefono,
+    id_rol
+)
+SELECT
+    'admin',
+    'Admin2026*',
+    'Administrador',
+    'Sistema',
+    'admin@bienestar.com',
+    NULL,
+    id_rol
+FROM seg.roles
+WHERE rol_nombre = 'ADMIN'
+AND NOT EXISTS (
+    SELECT 1 
+    FROM seg.usuarios 
+    WHERE usuario = 'admin'
+);
+
+-- =============================================
 -- CATALOGOS (cat)
 -- =============================================
 CREATE TABLE cat.categorias(
