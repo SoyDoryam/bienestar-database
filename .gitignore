@@ -1,0 +1,10 @@
+# Database dumps
+*.sql.bak
+*.dump
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
