@@ -7,20 +7,20 @@ Scripts SQL para la base de datos del sistema de bienestar.
 - `init.sql` - Esquemas, tablas y datos iniciales
 - `sp_seg.sql` - Stored procedures para seguridad (roles y usuarios)
 
-## Ejecución con Docker
+## Ejecución con Docker Compose
 
 ```bash
-# Crear y ejecutar contenedor PostgreSQL
-docker run -d --name bienestar-db \
-  -e POSTGRES_DB=bienestar \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -p 5432:5432 \
-  postgres:16-alpine
+# Ir a la carpeta del proyecto
+cd "C:\Users\doria\OneDrive\Documentos\04-Projectos\bienestar\bienestar-database"
 
-# Esperar 10 segundos, luego ejecutar scripts
-docker exec -i bienestar-db psql -U postgres -d bienestar < init.sql
-docker exec -i bienestar-db psql -U postgres -d bienestar < sp_seg.sql
+# Eliminar contenedor Y volumen (borra datos existentes)
+docker-compose down -v
+
+# Recrear contenedor (ejecutará init.sql y sp_seg.sql automáticamente)
+docker-compose up -d
+
+# Verificar logs para confirmar que se ejecutaron
+docker-compose logs postgres
 ```
 
 ## Ejecución Manual (psql)
