@@ -264,7 +264,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- LOGIN USUARIO (验证用户登录)
+-- LOGIN USUARIO
 CREATE OR REPLACE FUNCTION seg.f_usuarios_login(
     p_usuario VARCHAR(50),
     p_contrasena VARCHAR(255)
@@ -274,8 +274,7 @@ RETURNS TABLE(
     usuario VARCHAR(50),
     nombre VARCHAR(100),
     apellido VARCHAR(100),
-    rol_nombre VARCHAR(50),
-    activo BOOLEAN
+    rol_nombre VARCHAR(50)
 ) AS $$
 BEGIN
     RETURN QUERY
@@ -284,10 +283,9 @@ BEGIN
         u.usuario,
         u.nombre,
         u.apellido,
-        r.rol_nombre,
-        u.activo
+        r.rol_nombre
     FROM seg.usuarios u
-    LEFT JOIN seg.roles r ON u.id_rol = r.id_rol
+    INNER JOIN seg.roles r ON u.id_rol = r.id_rol
     WHERE u.usuario = p_usuario 
       AND u.contrasena = p_contrasena 
       AND u.activo = TRUE;
