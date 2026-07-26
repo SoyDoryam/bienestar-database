@@ -202,9 +202,9 @@ CREATE OR REPLACE FUNCTION seg.f_usuarios_insert(
     p_contrasena VARCHAR(255),
     p_nombre VARCHAR(100),
     p_apellido VARCHAR(100),
+    p_id_rol INTEGER,
     p_correo VARCHAR(100) DEFAULT NULL,
-    p_telefono VARCHAR(20) DEFAULT NULL,
-    p_id_rol INTEGER
+    p_telefono VARCHAR(20) DEFAULT NULL
 )
 RETURNS INTEGER AS $$
 DECLARE
@@ -212,11 +212,11 @@ DECLARE
 BEGIN
     INSERT INTO seg.usuarios (
         usuario, contrasena, nombre, apellido, 
-        correo, telefono, id_rol
+        id_rol, correo, telefono
     )
     VALUES (
         p_usuario, p_contrasena, p_nombre, p_apellido,
-        p_correo, p_telefono, p_id_rol
+        p_id_rol, p_correo, p_telefono
     )
     RETURNING id_usuario INTO v_id;
     
