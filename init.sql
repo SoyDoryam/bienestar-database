@@ -46,6 +46,8 @@ INSERT INTO seg.roles (rol_nombre, descripcion) VALUES
 -- USUARIO ADMINISTRADOR INICIAL
 -- =============================================
 
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 INSERT INTO seg.usuarios
 (
     usuario,
@@ -58,7 +60,7 @@ INSERT INTO seg.usuarios
 )
 SELECT
     'admin',
-    'Admin2026*',
+    crypt('Admin2026*', gen_salt('bf', 10)),
     'Administrador',
     'Sistema',
     'admin@bienestar.com',
@@ -67,8 +69,8 @@ SELECT
 FROM seg.roles
 WHERE rol_nombre = 'ADMIN'
 AND NOT EXISTS (
-    SELECT 1 
-    FROM seg.usuarios 
+    SELECT 1
+    FROM seg.usuarios
     WHERE usuario = 'admin'
 );
 
