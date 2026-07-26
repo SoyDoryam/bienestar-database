@@ -2,37 +2,36 @@
 
 Scripts SQL para la base de datos del sistema de bienestar.
 
-## Contenido
+## Archivos
 
-- `init.sql` - Esquemas y tablas iniciales
+- `init.sql` - Esquemas, tablas y datos iniciales
 - `sp_seg.sql` - Stored procedures para seguridad (roles y usuarios)
 
-## Ejecucion con Docker
+## Ejecución con Docker
 
 ```bash
-# Crear volumen
-docker volume create postgres_data
-
-# Ejecutar contenedor con scripts
+# Crear y ejecutar contenedor PostgreSQL
 docker run -d --name bienestar-db \
   -e POSTGRES_DB=bienestar \
   -e POSTGRES_USER=postgres \
   -e POSTGRES_PASSWORD=postgres \
   -p 5432:5432 \
-  -v postgres_data:/var/lib/postgresql/data \
-  -v ./init.sql:/docker-entrypoint-initdb.d/init.sql \
   postgres:16-alpine
+
+# Esperar 10 segundos, luego ejecutar scripts
+docker exec -i bienestar-db psql -U postgres -d bienestar < init.sql
+docker exec -i bienestar-db psql -U postgres -d bienestar < sp_seg.sql
 ```
 
-## Ejecucion Manual
+## Ejecución Manual (psql)
 
 ```bash
-# Con psql
+# Con psql local
 psql -h localhost -U postgres -d bienestar -f init.sql
 psql -h localhost -U postgres -d bienestar -f sp_seg.sql
 ```
 
-## Conexion
+## Conexión
 
 ```bash
 # Docker
@@ -44,17 +43,40 @@ psql -U postgres -d bienestar
 
 ## Esquemas
 
-- **seg** - Seguridad (roles, usuarios)
-- **cat** - Catalogos (categorias, productos, marcas, proveedores)
-- **inv** - Inventario
-- **fac** - Facturas y pagos
-- **cfg** - Configuracion (sucursales, cajas)
+| Esquema | Descripción |
+|---------|-------------|
+| seg | Seguridad (roles, usuarios) |
+| cat | Catálogos (categorías, productos, marcas, proveedores) |
+| inv | Inventario |
+| fac | Facturas y pagos |
+| cfg | Configuración (sucursales, cajas) |
 
 ## Tablas Principales
 
-- seg.roles, seg.usuarios
-- cat.categorias, cat.productos, cat.marca, cat.presentacion, cat.proveedores
-- cat.catalogo, cat.catalogo_detalle, cat.sub_tipo_catalogo
-- inv.inventario
-- fac.clientes, fac.facturas, fac.factura_detalle, fac.pagos, fac.metodos_pago
-- cfg.sucursales, cfg.cajas
+### seg (Seguridad)
+- `seg.roles` - Roles del sistema
+- `seg.usuarios` - Usuarios del sistema
+
+### cat (Catálogos)
+- `cat.categorias` - Categorías de productos
+- `cat.proveedores` - Proveedores
+- `cat.marca` - Marcas
+- `cat.presentacion` - Presentaciones
+- `cat.productos` - Productos
+- `cat.sub_tipo_catalogo` - Tipos de catálogo
+- `cat.catalogo` - Catálogos promocionales
+- `cat.catalogo_detalle` - Detalle de catálogos
+
+### inv (Inventario)
+- `inv.inventario` - Movimientos de inventario
+
+### fac (Facturación)
+- `fac.clientes` - Clientes
+- `fac.facturas` - Facturas
+- `fac.factura_detalle` - Detalle de facturas
+- `fac.metodos_pago` - Métodos de pago
+- `fac.pagos` - Pagos
+
+### cfg (Configuración)
+- `cfg.sucursales` - Sucursales
+- `cfg.cajas` - Cajas
