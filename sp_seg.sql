@@ -340,3 +340,592 @@ BEGIN
       AND u.activo = TRUE;
 END;
 $$ LANGUAGE plpgsql;
+
+-- =============================================
+-- STORED PROCEDURES/FUNCTIONS PARA CATEGORIAS (cat)
+-- =============================================
+
+CREATE OR REPLACE FUNCTION cat.f_categorias_get_all()
+RETURNS TABLE(
+    id_categoria INTEGER,
+    codigo_categoria VARCHAR(20),
+    categoria_nombre VARCHAR(100),
+    descripcion VARCHAR(255),
+    activo BOOLEAN,
+    fecha_registro TIMESTAMP
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT c.id_categoria, c.codigo_categoria, c.categoria_nombre, c.descripcion, c.activo, c.fecha_registro
+    FROM cat.categorias c
+    ORDER BY c.id_categoria;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_categorias_get_by_id(p_id_categoria INTEGER)
+RETURNS TABLE(
+    id_categoria INTEGER,
+    codigo_categoria VARCHAR(20),
+    categoria_nombre VARCHAR(100),
+    descripcion VARCHAR(255),
+    activo BOOLEAN,
+    fecha_registro TIMESTAMP
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT c.id_categoria, c.codigo_categoria, c.categoria_nombre, c.descripcion, c.activo, c.fecha_registro
+    FROM cat.categorias c
+    WHERE c.id_categoria = p_id_categoria;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_categorias_insert(
+    p_codigo_categoria VARCHAR(20),
+    p_categoria_nombre VARCHAR(100),
+    p_descripcion VARCHAR(255) DEFAULT NULL,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS INTEGER AS $$
+DECLARE
+    v_id INTEGER;
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN 999;
+    END IF;
+    INSERT INTO cat.categorias (codigo_categoria, categoria_nombre, descripcion)
+    VALUES (p_codigo_categoria, p_categoria_nombre, p_descripcion)
+    RETURNING id_categoria INTO v_id;
+    RETURN v_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_categorias_update(
+    p_id_categoria INTEGER,
+    p_codigo_categoria VARCHAR(20) DEFAULT NULL,
+    p_categoria_nombre VARCHAR(100) DEFAULT NULL,
+    p_descripcion VARCHAR(255) DEFAULT NULL,
+    p_activo BOOLEAN DEFAULT NULL,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN true;
+    END IF;
+    UPDATE cat.categorias SET
+        codigo_categoria = COALESCE(p_codigo_categoria, codigo_categoria),
+        categoria_nombre = COALESCE(p_categoria_nombre, categoria_nombre),
+        descripcion = COALESCE(p_descripcion, descripcion),
+        activo = COALESCE(p_activo, activo)
+    WHERE id_categoria = p_id_categoria;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_categorias_delete(
+    p_id_categoria INTEGER,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN true;
+    END IF;
+    DELETE FROM cat.categorias WHERE id_categoria = p_id_categoria;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+-- =============================================
+-- STORED PROCEDURES/FUNCTIONS PARA PROVEEDORES (cat)
+-- =============================================
+
+CREATE OR REPLACE FUNCTION cat.f_proveedores_get_all()
+RETURNS TABLE(
+    id_proveedor INTEGER,
+    codigo_proveedor VARCHAR(20),
+    proveedor_nombre VARCHAR(200),
+    contacto VARCHAR(100),
+    telefono VARCHAR(20),
+    correo VARCHAR(100),
+    direccion VARCHAR(300),
+    notas VARCHAR(500),
+    activo BOOLEAN,
+    fecha_registro TIMESTAMP
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT p.id_proveedor, p.codigo_proveedor, p.proveedor_nombre, p.contacto, p.telefono,
+           p.correo, p.direccion, p.notas, p.activo, p.fecha_registro
+    FROM cat.proveedores p
+    ORDER BY p.id_proveedor;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_proveedores_get_by_id(p_id_proveedor INTEGER)
+RETURNS TABLE(
+    id_proveedor INTEGER,
+    codigo_proveedor VARCHAR(20),
+    proveedor_nombre VARCHAR(200),
+    contacto VARCHAR(100),
+    telefono VARCHAR(20),
+    correo VARCHAR(100),
+    direccion VARCHAR(300),
+    notas VARCHAR(500),
+    activo BOOLEAN,
+    fecha_registro TIMESTAMP
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT p.id_proveedor, p.codigo_proveedor, p.proveedor_nombre, p.contacto, p.telefono,
+           p.correo, p.direccion, p.notas, p.activo, p.fecha_registro
+    FROM cat.proveedores p
+    WHERE p.id_proveedor = p_id_proveedor;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_proveedores_insert(
+    p_codigo_proveedor VARCHAR(20),
+    p_proveedor_nombre VARCHAR(200),
+    p_contacto VARCHAR(100) DEFAULT NULL,
+    p_telefono VARCHAR(20) DEFAULT NULL,
+    p_correo VARCHAR(100) DEFAULT NULL,
+    p_direccion VARCHAR(300) DEFAULT NULL,
+    p_notas VARCHAR(500) DEFAULT NULL,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS INTEGER AS $$
+DECLARE
+    v_id INTEGER;
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN 999;
+    END IF;
+    INSERT INTO cat.proveedores (codigo_proveedor, proveedor_nombre, contacto, telefono, correo, direccion, notas)
+    VALUES (p_codigo_proveedor, p_proveedor_nombre, p_contacto, p_telefono, p_correo, p_direccion, p_notas)
+    RETURNING id_proveedor INTO v_id;
+    RETURN v_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_proveedores_update(
+    p_id_proveedor INTEGER,
+    p_codigo_proveedor VARCHAR(20) DEFAULT NULL,
+    p_proveedor_nombre VARCHAR(200) DEFAULT NULL,
+    p_contacto VARCHAR(100) DEFAULT NULL,
+    p_telefono VARCHAR(20) DEFAULT NULL,
+    p_correo VARCHAR(100) DEFAULT NULL,
+    p_direccion VARCHAR(300) DEFAULT NULL,
+    p_notas VARCHAR(500) DEFAULT NULL,
+    p_activo BOOLEAN DEFAULT NULL,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN true;
+    END IF;
+    UPDATE cat.proveedores SET
+        codigo_proveedor = COALESCE(p_codigo_proveedor, codigo_proveedor),
+        proveedor_nombre = COALESCE(p_proveedor_nombre, proveedor_nombre),
+        contacto = COALESCE(p_contacto, contacto),
+        telefono = COALESCE(p_telefono, telefono),
+        correo = COALESCE(p_correo, correo),
+        direccion = COALESCE(p_direccion, direccion),
+        notas = COALESCE(p_notas, notas),
+        activo = COALESCE(p_activo, activo),
+        fecha_actualiza = CURRENT_TIMESTAMP
+    WHERE id_proveedor = p_id_proveedor;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_proveedores_delete(
+    p_id_proveedor INTEGER,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN true;
+    END IF;
+    DELETE FROM cat.proveedores WHERE id_proveedor = p_id_proveedor;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+-- =============================================
+-- STORED PROCEDURES/FUNCTIONS PARA MARCA (cat)
+-- =============================================
+
+CREATE OR REPLACE FUNCTION cat.f_marca_get_all()
+RETURNS TABLE(
+    id_marca INTEGER,
+    marca_nombre VARCHAR(100),
+    descripcion VARCHAR(255),
+    activo BOOLEAN,
+    fecha_registro TIMESTAMP
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT m.id_marca, m.marca_nombre, m.descripcion, m.activo, m.fecha_registro
+    FROM cat.marca m
+    ORDER BY m.id_marca;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_marca_get_by_id(p_id_marca INTEGER)
+RETURNS TABLE(
+    id_marca INTEGER,
+    marca_nombre VARCHAR(100),
+    descripcion VARCHAR(255),
+    activo BOOLEAN,
+    fecha_registro TIMESTAMP
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT m.id_marca, m.marca_nombre, m.descripcion, m.activo, m.fecha_registro
+    FROM cat.marca m
+    WHERE m.id_marca = p_id_marca;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_marca_insert(
+    p_marca_nombre VARCHAR(100),
+    p_descripcion VARCHAR(255) DEFAULT NULL,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS INTEGER AS $$
+DECLARE
+    v_id INTEGER;
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN 999;
+    END IF;
+    INSERT INTO cat.marca (marca_nombre, descripcion)
+    VALUES (p_marca_nombre, p_descripcion)
+    RETURNING id_marca INTO v_id;
+    RETURN v_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_marca_update(
+    p_id_marca INTEGER,
+    p_marca_nombre VARCHAR(100) DEFAULT NULL,
+    p_descripcion VARCHAR(255) DEFAULT NULL,
+    p_activo BOOLEAN DEFAULT NULL,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN true;
+    END IF;
+    UPDATE cat.marca SET
+        marca_nombre = COALESCE(p_marca_nombre, marca_nombre),
+        descripcion = COALESCE(p_descripcion, descripcion),
+        activo = COALESCE(p_activo, activo)
+    WHERE id_marca = p_id_marca;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_marca_delete(
+    p_id_marca INTEGER,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN true;
+    END IF;
+    DELETE FROM cat.marca WHERE id_marca = p_id_marca;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+-- =============================================
+-- STORED PROCEDURES/FUNCTIONS PARA PRESENTACION (cat)
+-- =============================================
+
+CREATE OR REPLACE FUNCTION cat.f_presentacion_get_all()
+RETURNS TABLE(
+    id_presentacion INTEGER,
+    presentacion_nombre VARCHAR(100),
+    descripcion VARCHAR(255),
+    activo BOOLEAN,
+    fecha_registro TIMESTAMP
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT p.id_presentacion, p.presentacion_nombre, p.descripcion, p.activo, p.fecha_registro
+    FROM cat.presentacion p
+    ORDER BY p.id_presentacion;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_presentacion_get_by_id(p_id_presentacion INTEGER)
+RETURNS TABLE(
+    id_presentacion INTEGER,
+    presentacion_nombre VARCHAR(100),
+    descripcion VARCHAR(255),
+    activo BOOLEAN,
+    fecha_registro TIMESTAMP
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT p.id_presentacion, p.presentacion_nombre, p.descripcion, p.activo, p.fecha_registro
+    FROM cat.presentacion p
+    WHERE p.id_presentacion = p_id_presentacion;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_presentacion_insert(
+    p_presentacion_nombre VARCHAR(100),
+    p_descripcion VARCHAR(255) DEFAULT NULL,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS INTEGER AS $$
+DECLARE
+    v_id INTEGER;
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN 999;
+    END IF;
+    INSERT INTO cat.presentacion (presentacion_nombre, descripcion)
+    VALUES (p_presentacion_nombre, p_descripcion)
+    RETURNING id_presentacion INTO v_id;
+    RETURN v_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_presentacion_update(
+    p_id_presentacion INTEGER,
+    p_presentacion_nombre VARCHAR(100) DEFAULT NULL,
+    p_descripcion VARCHAR(255) DEFAULT NULL,
+    p_activo BOOLEAN DEFAULT NULL,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN true;
+    END IF;
+    UPDATE cat.presentacion SET
+        presentacion_nombre = COALESCE(p_presentacion_nombre, presentacion_nombre),
+        descripcion = COALESCE(p_descripcion, descripcion),
+        activo = COALESCE(p_activo, activo)
+    WHERE id_presentacion = p_id_presentacion;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_presentacion_delete(
+    p_id_presentacion INTEGER,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN true;
+    END IF;
+    DELETE FROM cat.presentacion WHERE id_presentacion = p_id_presentacion;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+-- =============================================
+-- STORED PROCEDURES/FUNCTIONS PARA PRODUCTOS (cat)
+-- =============================================
+
+CREATE OR REPLACE FUNCTION cat.f_productos_get_all()
+RETURNS TABLE(
+    id_producto INTEGER,
+    codigo VARCHAR(20),
+    codigo_barras VARCHAR(50),
+    producto_nombre VARCHAR(200),
+    descripcion VARCHAR(500),
+    id_categoria INTEGER,
+    categoria_nombre VARCHAR(100),
+    precio_compra NUMERIC(18,2),
+    precio_venta NUMERIC(18,2),
+    precio_venta_usd NUMERIC(18,2),
+    stock_minimo INTEGER,
+    stock_actual INTEGER,
+    fecha_vencimiento DATE,
+    lote VARCHAR(50),
+    id_proveedor INTEGER,
+    proveedor_nombre VARCHAR(200),
+    id_marca INTEGER,
+    marca_nombre VARCHAR(100),
+    id_presentacion INTEGER,
+    presentacion_nombre VARCHAR(100),
+    activo BOOLEAN,
+    fecha_registro TIMESTAMP
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        pr.id_producto, pr.codigo, pr.codigo_barras, pr.producto_nombre, pr.descripcion,
+        pr.id_categoria, COALESCE(ca.categoria_nombre, ''),
+        pr.precio_compra, pr.precio_venta, pr.precio_venta_usd,
+        pr.stock_minimo, pr.stock_actual, pr.fecha_vencimiento, pr.lote,
+        pr.id_proveedor, COALESCE(pv.proveedor_nombre, ''),
+        pr.id_marca, COALESCE(m.marca_nombre, ''),
+        pr.id_presentacion, COALESCE(pr2.presentacion_nombre, ''),
+        pr.activo, pr.fecha_registro
+    FROM cat.productos pr
+    LEFT JOIN cat.categorias ca ON pr.id_categoria = ca.id_categoria
+    LEFT JOIN cat.proveedores pv ON pr.id_proveedor = pv.id_proveedor
+    LEFT JOIN cat.marca m ON pr.id_marca = m.id_marca
+    LEFT JOIN cat.presentacion pr2 ON pr.id_presentacion = pr2.id_presentacion
+    ORDER BY pr.id_producto;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_productos_get_by_id(p_id_producto INTEGER)
+RETURNS TABLE(
+    id_producto INTEGER,
+    codigo VARCHAR(20),
+    codigo_barras VARCHAR(50),
+    producto_nombre VARCHAR(200),
+    descripcion VARCHAR(500),
+    id_categoria INTEGER,
+    categoria_nombre VARCHAR(100),
+    precio_compra NUMERIC(18,2),
+    precio_venta NUMERIC(18,2),
+    precio_venta_usd NUMERIC(18,2),
+    stock_minimo INTEGER,
+    stock_actual INTEGER,
+    fecha_vencimiento DATE,
+    lote VARCHAR(50),
+    id_proveedor INTEGER,
+    proveedor_nombre VARCHAR(200),
+    id_marca INTEGER,
+    marca_nombre VARCHAR(100),
+    id_presentacion INTEGER,
+    presentacion_nombre VARCHAR(100),
+    activo BOOLEAN,
+    fecha_registro TIMESTAMP
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        pr.id_producto, pr.codigo, pr.codigo_barras, pr.producto_nombre, pr.descripcion,
+        pr.id_categoria, COALESCE(ca.categoria_nombre, ''),
+        pr.precio_compra, pr.precio_venta, pr.precio_venta_usd,
+        pr.stock_minimo, pr.stock_actual, pr.fecha_vencimiento, pr.lote,
+        pr.id_proveedor, COALESCE(pv.proveedor_nombre, ''),
+        pr.id_marca, COALESCE(m.marca_nombre, ''),
+        pr.id_presentacion, COALESCE(pr2.presentacion_nombre, ''),
+        pr.activo, pr.fecha_registro
+    FROM cat.productos pr
+    LEFT JOIN cat.categorias ca ON pr.id_categoria = ca.id_categoria
+    LEFT JOIN cat.proveedores pv ON pr.id_proveedor = pv.id_proveedor
+    LEFT JOIN cat.marca m ON pr.id_marca = m.id_marca
+    LEFT JOIN cat.presentacion pr2 ON pr.id_presentacion = pr2.id_presentacion
+    WHERE pr.id_producto = p_id_producto;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_productos_insert(
+    p_codigo VARCHAR(20),
+    p_codigo_barras VARCHAR(50) DEFAULT NULL,
+    p_producto_nombre VARCHAR(200),
+    p_descripcion VARCHAR(500) DEFAULT NULL,
+    p_id_categoria INTEGER,
+    p_precio_compra NUMERIC(18,2) DEFAULT 0,
+    p_precio_venta NUMERIC(18,2) DEFAULT 0,
+    p_precio_venta_usd NUMERIC(18,2) DEFAULT NULL,
+    p_stock_minimo INTEGER DEFAULT 0,
+    p_stock_actual INTEGER DEFAULT 0,
+    p_fecha_vencimiento DATE DEFAULT NULL,
+    p_lote VARCHAR(50) DEFAULT NULL,
+    p_id_proveedor INTEGER DEFAULT NULL,
+    p_id_marca INTEGER DEFAULT NULL,
+    p_id_presentacion INTEGER DEFAULT NULL,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS INTEGER AS $$
+DECLARE
+    v_id INTEGER;
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN 999;
+    END IF;
+    INSERT INTO cat.productos (
+        codigo, codigo_barras, producto_nombre, descripcion, id_categoria,
+        precio_compra, precio_venta, precio_venta_usd, stock_minimo, stock_actual,
+        fecha_vencimiento, lote, id_proveedor, id_marca, id_presentacion
+    )
+    VALUES (
+        p_codigo, p_codigo_barras, p_producto_nombre, p_descripcion, p_id_categoria,
+        p_precio_compra, p_precio_venta, p_precio_venta_usd, p_stock_minimo, p_stock_actual,
+        p_fecha_vencimiento, p_lote, p_id_proveedor, p_id_marca, p_id_presentacion
+    )
+    RETURNING id_producto INTO v_id;
+    RETURN v_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_productos_update(
+    p_id_producto INTEGER,
+    p_codigo VARCHAR(20) DEFAULT NULL,
+    p_codigo_barras VARCHAR(50) DEFAULT NULL,
+    p_producto_nombre VARCHAR(200) DEFAULT NULL,
+    p_descripcion VARCHAR(500) DEFAULT NULL,
+    p_id_categoria INTEGER DEFAULT NULL,
+    p_precio_compra NUMERIC(18,2) DEFAULT NULL,
+    p_precio_venta NUMERIC(18,2) DEFAULT NULL,
+    p_precio_venta_usd NUMERIC(18,2) DEFAULT NULL,
+    p_stock_minimo INTEGER DEFAULT NULL,
+    p_stock_actual INTEGER DEFAULT NULL,
+    p_fecha_vencimiento DATE DEFAULT NULL,
+    p_lote VARCHAR(50) DEFAULT NULL,
+    p_id_proveedor INTEGER DEFAULT NULL,
+    p_id_marca INTEGER DEFAULT NULL,
+    p_id_presentacion INTEGER DEFAULT NULL,
+    p_activo BOOLEAN DEFAULT NULL,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN true;
+    END IF;
+    UPDATE cat.productos SET
+        codigo = COALESCE(p_codigo, codigo),
+        codigo_barras = COALESCE(p_codigo_barras, codigo_barras),
+        producto_nombre = COALESCE(p_producto_nombre, producto_nombre),
+        descripcion = COALESCE(p_descripcion, descripcion),
+        id_categoria = COALESCE(p_id_categoria, id_categoria),
+        precio_compra = COALESCE(p_precio_compra, precio_compra),
+        precio_venta = COALESCE(p_precio_venta, precio_venta),
+        precio_venta_usd = COALESCE(p_precio_venta_usd, precio_venta_usd),
+        stock_minimo = COALESCE(p_stock_minimo, stock_minimo),
+        stock_actual = COALESCE(p_stock_actual, stock_actual),
+        fecha_vencimiento = COALESCE(p_fecha_vencimiento, fecha_vencimiento),
+        lote = COALESCE(p_lote, lote),
+        id_proveedor = COALESCE(p_id_proveedor, id_proveedor),
+        id_marca = COALESCE(p_id_marca, id_marca),
+        id_presentacion = COALESCE(p_id_presentacion, id_presentacion),
+        activo = COALESCE(p_activo, activo),
+        fecha_actualiza = CURRENT_TIMESTAMP
+    WHERE id_producto = p_id_producto;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cat.f_productos_delete(
+    p_id_producto INTEGER,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS BOOLEAN AS $$
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN true;
+    END IF;
+    DELETE FROM cat.productos WHERE id_producto = p_id_producto;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
