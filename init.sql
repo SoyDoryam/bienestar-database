@@ -160,6 +160,13 @@ INSERT INTO cat.marca (marca_nombre, descripcion) VALUES
 ('Abbott', 'Abbott Laboratories'),
 ('Medley', 'Medley Farmacéutica');
 
+INSERT INTO cat.proveedores (codigo_proveedor, proveedor_nombre, contacto, telefono, correo, direccion, notas) VALUES
+('PRV001', 'Distribuidora Farmacéutica S.A.', 'Carlos Mendoza', '505-2222-1111', 'carlos.mendoza@distrifarma.com', 'Managua, Nicaragua', 'Distribuidor de medicamentos generales'),
+('PRV002', 'Laboclin S.A.', 'María Elena Pérez', '505-3333-4444', 'maria.perez@laboclin.com', 'León, Nicaragua', 'Especialistas en productos dermatológicos'),
+('PRV003', 'Suministros Médicos del Pacífico', 'Jorge Ramírez', '505-4444-5555', 'jorge.ramirez@sumedipac.com', 'Granada, Nicaragua', 'Equipos médicos y suministros'),
+('PRV004', 'Farmacéutica Nacional C.A.', 'Ana Lucía Torres', '505-5555-6666', 'ana.torres@fanac.com', 'Estelí, Nicaragua', 'Medicamentos genéricos y controlado'),
+('PRV005', 'Importadora Médica S.A.', 'Roberto Díaz', '505-6666-7777', 'roberto.diaz@importmedica.com', 'Matagalpa, Nicaragua', 'Importación de equipos e insumos');
+
 INSERT INTO cat.presentacion (presentacion_nombre, descripcion) VALUES
 ('Tableta', 'Forma sólida'),
 ('Cápsula', 'Cápsula gelatinosa'),
