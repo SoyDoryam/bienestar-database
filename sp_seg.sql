@@ -830,10 +830,10 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION cat.f_productos_insert(
     p_codigo VARCHAR(20),
-    p_codigo_barras VARCHAR(50) DEFAULT NULL,
     p_producto_nombre VARCHAR(200),
-    p_descripcion VARCHAR(500) DEFAULT NULL,
     p_id_categoria INTEGER,
+    p_codigo_barras VARCHAR(50) DEFAULT NULL,
+    p_descripcion VARCHAR(500) DEFAULT NULL,
     p_precio_compra NUMERIC(18,2) DEFAULT 0,
     p_precio_venta NUMERIC(18,2) DEFAULT 0,
     p_precio_venta_usd NUMERIC(18,2) DEFAULT NULL,
@@ -854,12 +854,12 @@ BEGIN
         RETURN 999;
     END IF;
     INSERT INTO cat.productos (
-        codigo, codigo_barras, producto_nombre, descripcion, id_categoria,
+        codigo, producto_nombre, id_categoria, codigo_barras, descripcion,
         precio_compra, precio_venta, precio_venta_usd, stock_minimo, stock_actual,
         fecha_vencimiento, lote, id_proveedor, id_marca, id_presentacion
     )
     VALUES (
-        p_codigo, p_codigo_barras, p_producto_nombre, p_descripcion, p_id_categoria,
+        p_codigo, p_producto_nombre, p_id_categoria, p_codigo_barras, p_descripcion,
         p_precio_compra, p_precio_venta, p_precio_venta_usd, p_stock_minimo, p_stock_actual,
         p_fecha_vencimiento, p_lote, p_id_proveedor, p_id_marca, p_id_presentacion
     )
