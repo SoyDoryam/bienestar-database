@@ -752,8 +752,6 @@ RETURNS TABLE(
     precio_venta_usd NUMERIC(18,2),
     stock_minimo INTEGER,
     stock_actual INTEGER,
-    fecha_vencimiento DATE,
-    lote VARCHAR(50),
     id_proveedor INTEGER,
     proveedor_nombre VARCHAR(200),
     id_marca INTEGER,
@@ -769,7 +767,7 @@ BEGIN
         pr.id_producto, pr.codigo, pr.codigo_barras, pr.producto_nombre, pr.descripcion,
         pr.id_categoria, COALESCE(ca.categoria_nombre, ''),
         pr.precio_compra, pr.precio_venta, pr.precio_venta_usd,
-        pr.stock_minimo, pr.stock_actual, pr.fecha_vencimiento, pr.lote,
+        pr.stock_minimo, pr.stock_actual,
         pr.id_proveedor, COALESCE(pv.proveedor_nombre, ''),
         pr.id_marca, COALESCE(m.marca_nombre, ''),
         pr.id_presentacion, COALESCE(pr2.presentacion_nombre, ''),
@@ -797,8 +795,6 @@ RETURNS TABLE(
     precio_venta_usd NUMERIC(18,2),
     stock_minimo INTEGER,
     stock_actual INTEGER,
-    fecha_vencimiento DATE,
-    lote VARCHAR(50),
     id_proveedor INTEGER,
     proveedor_nombre VARCHAR(200),
     id_marca INTEGER,
@@ -814,7 +810,7 @@ BEGIN
         pr.id_producto, pr.codigo, pr.codigo_barras, pr.producto_nombre, pr.descripcion,
         pr.id_categoria, COALESCE(ca.categoria_nombre, ''),
         pr.precio_compra, pr.precio_venta, pr.precio_venta_usd,
-        pr.stock_minimo, pr.stock_actual, pr.fecha_vencimiento, pr.lote,
+        pr.stock_minimo, pr.stock_actual,
         pr.id_proveedor, COALESCE(pv.proveedor_nombre, ''),
         pr.id_marca, COALESCE(m.marca_nombre, ''),
         pr.id_presentacion, COALESCE(pr2.presentacion_nombre, ''),
@@ -839,8 +835,6 @@ CREATE OR REPLACE FUNCTION cat.f_productos_insert(
     p_precio_venta_usd NUMERIC(18,2) DEFAULT NULL,
     p_stock_minimo INTEGER DEFAULT 0,
     p_stock_actual INTEGER DEFAULT 0,
-    p_fecha_vencimiento DATE DEFAULT NULL,
-    p_lote VARCHAR(50) DEFAULT NULL,
     p_id_proveedor INTEGER DEFAULT NULL,
     p_id_marca INTEGER DEFAULT NULL,
     p_id_presentacion INTEGER DEFAULT NULL,
@@ -856,12 +850,12 @@ BEGIN
     INSERT INTO cat.productos (
         codigo, producto_nombre, id_categoria, codigo_barras, descripcion,
         precio_compra, precio_venta, precio_venta_usd, stock_minimo, stock_actual,
-        fecha_vencimiento, lote, id_proveedor, id_marca, id_presentacion
+        id_proveedor, id_marca, id_presentacion
     )
     VALUES (
         p_codigo, p_producto_nombre, p_id_categoria, p_codigo_barras, p_descripcion,
         p_precio_compra, p_precio_venta, p_precio_venta_usd, p_stock_minimo, p_stock_actual,
-        p_fecha_vencimiento, p_lote, p_id_proveedor, p_id_marca, p_id_presentacion
+        p_id_proveedor, p_id_marca, p_id_presentacion
     )
     RETURNING id_producto INTO v_id;
     RETURN v_id;
@@ -880,8 +874,6 @@ CREATE OR REPLACE FUNCTION cat.f_productos_update(
     p_precio_venta_usd NUMERIC(18,2) DEFAULT NULL,
     p_stock_minimo INTEGER DEFAULT NULL,
     p_stock_actual INTEGER DEFAULT NULL,
-    p_fecha_vencimiento DATE DEFAULT NULL,
-    p_lote VARCHAR(50) DEFAULT NULL,
     p_id_proveedor INTEGER DEFAULT NULL,
     p_id_marca INTEGER DEFAULT NULL,
     p_id_presentacion INTEGER DEFAULT NULL,
@@ -904,8 +896,6 @@ BEGIN
         precio_venta_usd = COALESCE(p_precio_venta_usd, precio_venta_usd),
         stock_minimo = COALESCE(p_stock_minimo, stock_minimo),
         stock_actual = COALESCE(p_stock_actual, stock_actual),
-        fecha_vencimiento = COALESCE(p_fecha_vencimiento, fecha_vencimiento),
-        lote = COALESCE(p_lote, lote),
         id_proveedor = COALESCE(p_id_proveedor, id_proveedor),
         id_marca = COALESCE(p_id_marca, id_marca),
         id_presentacion = COALESCE(p_id_presentacion, id_presentacion),
