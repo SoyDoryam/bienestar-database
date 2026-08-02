@@ -929,3 +929,228 @@ BEGIN
     RETURN FOUND;
 END;
 $$ LANGUAGE plpgsql;
+
+-- =============================================
+-- STORED PROCEDURES/FUNCTIONS PARA LOTES (inv)
+-- =============================================
+
+CREATE OR REPLACE FUNCTION inv.f_lotes_get_all()
+RETURNS TABLE(
+    id_lote INTEGER,
+    id_producto INTEGER,
+    producto_nombre VARCHAR(200),
+    numero_lote VARCHAR(50),
+    fecha_vencimiento DATE,
+    cantidad_entrada INTEGER,
+    cantidad_actual INTEGER,
+    precio_compra NUMERIC(18,2),
+    fecha_entrada TIMESTAMP,
+    id_proveedor INTEGER,
+    proveedor_nombre VARCHAR(200),
+    activo BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        l.id_lote, l.id_producto, p.producto_nombre, l.numero_lote,
+        l.fecha_vencimiento, l.cantidad_entrada, l.cantidad_actual,
+        l.precio_compra, l.fecha_entrada, l.id_proveedor,
+        COALESCE(pr.proveedor_nombre, ''), l.activo
+    FROM inv.lotes l
+    LEFT JOIN cat.productos p ON l.id_producto = p.id_producto
+    LEFT JOIN cat.proveedores pr ON l.id_proveedor = pr.id_proveedor
+    ORDER BY l.id_lote DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION inv.f_lotes_get_by_id(p_id_lote INTEGER)
+RETURNS TABLE(
+    id_lote INTEGER,
+    id_producto INTEGER,
+    producto_nombre VARCHAR(200),
+    numero_lote VARCHAR(50),
+    fecha_vencimiento DATE,
+    cantidad_entrada INTEGER,
+    cantidad_actual INTEGER,
+    precio_compra NUMERIC(18,2),
+    fecha_entrada TIMESTAMP,
+    id_proveedor INTEGER,
+    proveedor_nombre VARCHAR(200),
+    activo BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        l.id_lote, l.id_producto, p.producto_nombre, l.numero_lote,
+        l.fecha_vencimiento, l.cantidad_entrada, l.cantidad_actual,
+        l.precio_compra, l.fecha_entrada, l.id_proveedor,
+        COALESCE(pr.proveedor_nombre, ''), l.activo
+    FROM inv.lotes l
+    LEFT JOIN cat.productos p ON l.id_producto = p.id_producto
+    LEFT JOIN cat.proveedores pr ON l.id_proveedor = pr.id_proveedor
+    WHERE l.id_lote = p_id_lote;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION inv.f_lotes_get_by_producto(p_id_producto INTEGER)
+RETURNS TABLE(
+    id_lote INTEGER,
+    id_producto INTEGER,
+    producto_nombre VARCHAR(200),
+    numero_lote VARCHAR(50),
+    fecha_vencimiento DATE,
+    cantidad_entrada INTEGER,
+    cantidad_actual INTEGER,
+    precio_compra NUMERIC(18,2),
+    fecha_entrada TIMESTAMP,
+    id_proveedor INTEGER,
+    proveedor_nombre VARCHAR(200),
+    activo BOOLEAN
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        l.id_lote, l.id_producto, p.producto_nombre, l.numero_lote,
+        l.fecha_vencimiento, l.cantidad_entrada, l.cantidad_actual,
+        l.precio_compra, l.fecha_entrada, l.id_proveedor,
+        COALESCE(pr.proveedor_nombre, ''), l.activo
+    FROM inv.lotes l
+    LEFT JOIN cat.productos p ON l.id_producto = p.id_producto
+    LEFT JOIN cat.proveedores pr ON l.id_proveedor = pr.id_proveedor
+    WHERE l.id_producto = p_id_producto AND l.cantidad_actual > 0 AND l.activo = true
+    ORDER BY l.fecha_vencimiento ASC NULLS LAST;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION inv.f_lotes_insert(
+    p_id_producto INTEGER,
+    p_numero_lote VARCHAR(50),
+    p_fecha_vencimiento DATE DEFAULT NULL,
+    p_cantidad_entrada INTEGER,
+    p_precio_compra NUMERIC(18,2) DEFAULT 0,
+    p_id_proveedor INTEGER DEFAULT NULL,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS INTEGER AS $$
+DECLARE
+    v_id INTEGER;
+    v_cantidad INTEGER;
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN 999;
+    END IF;
+
+    INSERT INTO inv.lotes (
+        id_producto, numero_lote, fecha_vencimiento,
+        cantidad_entrada, cantidad_actual, precio_compra, id_proveedor
+    )
+    VALUES (
+        p_id_producto, p_numero_lote, p_fecha_vencimiento,
+        p_cantidad_entrada, p_cantidad_entrada, p_precio_compra, p_id_proveedor
+    )
+    RETURNING id_lote INTO v_id;
+
+    UPDATE cat.productos
+    SET stock_actual = stock_actual + p_cantidad_entrada,
+        fecha_actualiza = CURRENT_TIMESTAMP
+    WHERE id_producto = p_id_producto;
+
+    RETURN v_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION inv.f_lotes_update(
+    p_id_lote INTEGER,
+    p_numero_lote VARCHAR(50) DEFAULT NULL,
+    p_fecha_vencimiento DATE DEFAULT NULL,
+    p_cantidad_actual INTEGER DEFAULT NULL,
+    p_precio_compra NUMERIC(18,2) DEFAULT NULL,
+    p_activo BOOLEAN DEFAULT NULL,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+    v_old_cantidad INTEGER;
+    v_new_cantidad INTEGER;
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN true;
+    END IF;
+
+    SELECT cantidad_actual INTO v_old_cantidad FROM inv.lotes WHERE id_lote = p_id_lote;
+
+    UPDATE inv.lotes SET
+        numero_lote = COALESCE(p_numero_lote, numero_lote),
+        fecha_vencimiento = COALESCE(p_fecha_vencimiento, fecha_vencimiento),
+        cantidad_actual = COALESCE(p_cantidad_actual, cantidad_actual),
+        precio_compra = COALESCE(p_precio_compra, precio_compra),
+        activo = COALESCE(p_activo, activo)
+    WHERE id_lote = p_id_lote;
+
+    IF p_cantidad_actual IS NOT NULL THEN
+        SELECT cantidad_actual INTO v_new_cantidad FROM inv.lotes WHERE id_lote = p_id_lote;
+        UPDATE cat.productos
+        SET stock_actual = stock_actual - v_old_cantidad + v_new_cantidad,
+            fecha_actualiza = CURRENT_TIMESTAMP
+        WHERE id_producto = (SELECT id_producto FROM inv.lotes WHERE id_lote = p_id_lote);
+    END IF;
+
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION inv.f_lotes_delete(
+    p_id_lote INTEGER,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+    v_id_producto INTEGER;
+    v_cantidad INTEGER;
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN true;
+    END IF;
+
+    SELECT id_producto, cantidad_actual INTO v_id_producto, v_cantidad
+    FROM inv.lotes WHERE id_lote = p_id_lote;
+
+    UPDATE cat.productos
+    SET stock_actual = stock_actual - v_cantidad,
+        fecha_actualiza = CURRENT_TIMESTAMP
+    WHERE id_producto = v_id_producto;
+
+    DELETE FROM inv.lotes WHERE id_lote = p_id_lote;
+    RETURN FOUND;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION inv.f_lotes_descontar(
+    p_id_lote INTEGER,
+    p_cantidad INTEGER,
+    p_simulate BOOLEAN DEFAULT false
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+    v_cantidad_actual INTEGER;
+BEGIN
+    IF seg.f_simulate_check(p_simulate) THEN
+        RETURN true;
+    END IF;
+
+    SELECT cantidad_actual INTO v_cantidad_actual
+    FROM inv.lotes WHERE id_lote = p_id_lote;
+
+    IF v_cantidad_actual < p_cantidad THEN
+        RETURN false;
+    END IF;
+
+    UPDATE inv.lotes SET cantidad_actual = cantidad_actual - p_cantidad
+    WHERE id_lote = p_id_lote;
+
+    UPDATE cat.productos SET stock_actual = stock_actual - p_cantidad
+    WHERE id_producto = (SELECT id_producto FROM inv.lotes WHERE id_lote = p_id_lote);
+
+    RETURN true;
+END;
+$$ LANGUAGE plpgsql;

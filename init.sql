@@ -128,8 +128,6 @@ CREATE TABLE cat.productos(
     precio_venta_usd NUMERIC(18,2),
     stock_minimo INTEGER NOT NULL DEFAULT 0,
     stock_actual INTEGER NOT NULL DEFAULT 0,
-    fecha_vencimiento DATE,
-    lote VARCHAR(50),
     id_proveedor INTEGER REFERENCES cat.proveedores(id_proveedor),
     id_marca INTEGER REFERENCES cat.marca(id_marca),
     id_presentacion INTEGER REFERENCES cat.presentacion(id_presentacion),
@@ -174,75 +172,75 @@ INSERT INTO cat.presentacion (id_presentacion, presentacion_nombre, descripcion)
 INSERT INTO cat.productos (
     id_producto, codigo, codigo_barras, producto_nombre, descripcion,
     id_categoria, precio_compra, precio_venta, precio_venta_usd,
-    stock_minimo, stock_actual, fecha_vencimiento, lote,
+    stock_minimo, stock_actual,
     id_proveedor, id_marca, id_presentacion
 ) VALUES
 
 -- FÓRMULAS LÁCTEAS
 (101, 'NUT-ENF-400', '7501234998877', 'Enfamil Premium Etapa 1 400g', 'Fórmula láctea en lata con hierro para lactantes de 0 a 6 meses',
- 2, 14.50, 19.50, 0.53, 5, 20, '2027-08-31', 'LT-ENF-2026', 2, 2, 2),
+ 2, 14.50, 19.50, 0.53, 5, 20, 2, 2, 2),
 
 (102, 'NUT-NAN-400', '7501234998884', 'Nan Pro Etapa 1 400g', 'Fórmula infantil con optipro y probióticos',
- 2, 13.80, 18.25, 0.49, 5, 18, '2027-10-15', 'LT-NAN-102', 2, 3, 2),
+ 2, 13.80, 18.25, 0.49, 5, 18, 2, 3, 2),
 
 (103, 'NUT-ENF-800', '7501234998891', 'Enfamil Premium Etapa 2 800g', 'Fórmula láctea de continuación para lactantes de 6 a 12 meses',
- 2, 26.00, 34.00, 0.92, 4, 12, '2027-11-20', 'LT-ENF-800', 2, 2, 2),
+ 2, 26.00, 34.00, 0.92, 4, 12, 2, 2, 2),
 
 -- JARABES Y MEDICAMENTOS LÍQUIDOS
 (104, 'MED-AMB-120', '7504455667788', 'Ambroxol Jarabe Infantil 120ml', 'Expectorante y mucolítico para alivio de la tos con flemas',
- 1, 2.10, 4.25, 0.12, 10, 35, '2027-03-15', 'LT-JAR-551', 1, 1, 3),
+ 1, 2.10, 4.25, 0.12, 10, 35, 1, 1, 3),
 
 (105, 'MED-LOR-100', '7504455667795', 'Loratadina Jarabe 100ml', 'Antihistamínico para alergias y rinitis alérgica',
- 1, 1.90, 3.80, 0.10, 8, 25, '2027-05-30', 'LT-LOR-882', 1, 1, 3),
+ 1, 1.90, 3.80, 0.10, 8, 25, 1, 1, 3),
 
 (106, 'MED-PAR-120', '7504455667801', 'Paracetamol Jarabe 120ml', 'Analgésico y antipirético infantil sabor a cereza',
- 1, 1.75, 3.50, 0.09, 12, 40, '2027-07-10', 'LT-PAR-301', 1, 1, 3),
+ 1, 1.75, 3.50, 0.09, 12, 40, 1, 1, 3),
 
 -- LACTANCIA Y BEBÉ
 (107, 'BEB-EVE-009', '7509876543210', 'Biberón Evenflo Anticólicos 9oz', 'Biberón libre de BPA con mamila de silicona flujo medio',
- 3, 3.80, 6.75, 0.18, 5, 15, NULL, NULL, 2, 4, 4),
+ 3, 3.80, 6.75, 0.18, 5, 15, 2, 4, 4),
 
 (108, 'BEB-EVE-004', '7509876543227', 'Biberón Evenflo Recién Nacido 4oz', 'Biberón compacto flujo lento para recién nacidos',
- 3, 3.10, 5.50, 0.15, 5, 12, NULL, NULL, 2, 4, 4),
+ 3, 3.10, 5.50, 0.15, 5, 12, 2, 4, 4),
 
 (109, 'BEB-MAM-002', '7509876543234', 'Mamilas de Silicona Evenflo (2 pack)', 'Repuesto de tetinas anticólicos flujo medio',
- 3, 1.50, 2.99, 0.08, 6, 20, NULL, NULL, 2, 4, 5),
+ 3, 1.50, 2.99, 0.08, 6, 20, 2, 4, 5),
 
 (110, 'BEB-CHU-001', '7509876543241', 'Chupón Ortodóntico Etapa 1', 'Chupón de entretención anatómico de silicona libre de BPA',
- 3, 1.20, 2.50, 0.07, 8, 14, NULL, NULL, 2, 4, 4),
+ 3, 1.20, 2.50, 0.07, 8, 14, 2, 4, 4),
 
 (111, 'BEB-CEP-001', '7509876543258', 'Cepillo Limpiador de Biberones', 'Cepillo con cerdas suaves y limpia-mamila integrado',
- 3, 1.80, 3.25, 0.09, 4, 10, NULL, NULL, 2, 4, 4),
+ 3, 1.80, 3.25, 0.09, 4, 10, 2, 4, 4),
 
 -- ANALGÉSICOS
 (112, 'MED-ACE-500', '7501000111223', 'Acetaminofén MK 500mg (Caja x 100)', 'Analgésico y antipirético para alivio de dolor y fiebre',
- 1, 2.10, 4.50, 0.12, 10, 50, '2028-01-15', 'LT-MK-8891', 1, 1, 1),
+ 1, 2.10, 4.50, 0.12, 10, 50, 1, 1, 1),
 
 (113, 'MED-ASP-500', '7501334455667', 'Aspirina Bayer 500mg (Caja x 40)', 'Ácido acetilsalicílico para alivio del dolor de cabeza y muscular',
- 1, 3.00, 5.80, 0.16, 10, 45, '2026-12-31', 'LT-ASP-990', 1, 6, 1),
+ 1, 3.00, 5.80, 0.16, 10, 45, 1, 6, 1),
 
 (114, 'MED-IBU-400', '7501000111247', 'Ibuprofeno MK 400mg (Caja x 50)', 'Antiinflamatorio no esteroideo para dolores fuertes',
- 1, 2.50, 5.00, 0.14, 8, 30, '2027-09-30', 'LT-IBU-441', 1, 1, 1),
+ 1, 2.50, 5.00, 0.14, 8, 30, 1, 1, 1),
 
 (115, 'MED-SUE-500', '7506543210987', 'Suero Oral Rehidratante 500ml', 'Solución de electrólitos orales sabor a manzana',
- 1, 0.90, 1.80, 0.05, 15, 60, '2026-11-15', 'LT-SUE-401', 1, 1, 3),
+ 1, 0.90, 1.80, 0.05, 15, 60, 1, 1, 3),
 
 -- PRIMEROS AUXILIOS
 (116, 'AUX-ALC-500', '7501122334455', 'Alcohol Etílico 70% Jaloma 500ml', 'Antiséptico de uso externo para desinfección de heridas',
- 4, 1.10, 2.25, 0.06, 10, 30, '2028-06-30', 'LT-JAL-7712', 3, 5, 3),
+ 4, 1.10, 2.25, 0.06, 10, 30, 3, 5, 3),
 
 (117, 'AUX-AGU-250', '7501122334462', 'Agua Oxigenada Jaloma 250ml', 'Solución antiséptica y hemostática para lavado de heridas',
- 4, 0.85, 1.75, 0.05, 10, 25, '2028-03-15', 'LT-JAL-221', 3, 5, 3),
+ 4, 0.85, 1.75, 0.05, 10, 25, 3, 5, 3),
 
 (118, 'AUX-GAS-010', '7501122334479', 'Gasas Estériles 3x3 (Sobre x 5)', 'Sobres de gasa de algodón para curaciones',
- 4, 0.40, 0.90, 0.02, 20, 80, NULL, NULL, 3, 5, 5),
+ 4, 0.40, 0.90, 0.02, 20, 80, 3, 5, 5),
 
 -- HIGIENE PERSONAL
 (119, 'HIG-TAL-200', '7507788990011', 'Talco Infantil Johnson 200g', 'Talco suave e hipoalergénico para absorción de humedad',
- 5, 2.20, 4.10, 0.11, 6, 18, NULL, NULL, 2, 7, 4),
+ 5, 2.20, 4.10, 0.11, 6, 18, 2, 7, 4),
 
 (120, 'HIG-COL-100', '7507788990028', 'Crema Dental Colgate Triple Acción 100ml', 'Crema dental con flúor para protección anticaries',
- 5, 1.30, 2.50, 0.07, 10, 35, '2027-04-30', 'LT-COL-991', 1, 8, 1);
+ 5, 1.30, 2.50, 0.07, 10, 35, 1, 8, 1);
 
 -- =============================================
 -- INVENTARIO (inv)
@@ -258,6 +256,50 @@ CREATE TABLE inv.inventario(
     id_usuario INTEGER NOT NULL REFERENCES seg.usuarios(id_usuario),
     fecha_movimiento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- =============================================
+-- LOTES (inv) - Tracking de lotes por producto
+-- =============================================
+CREATE TABLE inv.lotes(
+    id_lote SERIAL PRIMARY KEY,
+    id_producto INTEGER NOT NULL REFERENCES cat.productos(id_producto),
+    numero_lote VARCHAR(50) NOT NULL,
+    fecha_vencimiento DATE,
+    cantidad_entrada INTEGER NOT NULL,
+    cantidad_actual INTEGER NOT NULL,
+    precio_compra NUMERIC(18,2) NOT NULL DEFAULT 0,
+    fecha_entrada TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    id_proveedor INTEGER REFERENCES cat.proveedores(id_proveedor),
+    activo BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+INSERT INTO inv.lotes (id_producto, numero_lote, fecha_vencimiento, cantidad_entrada, cantidad_actual, precio_compra, id_proveedor) VALUES
+-- FÓRMULAS LÁCTEAS
+(101, 'LT-ENF-2026-A', '2027-08-31', 20, 20, 14.50, 2),
+(102, 'LT-NAN-102-A', '2027-10-15', 18, 18, 13.80, 2),
+(103, 'LT-ENF-800-A', '2027-11-20', 12, 12, 26.00, 2),
+-- JARABES
+(104, 'LT-JAR-551-A', '2027-03-15', 35, 35, 2.10, 1),
+(105, 'LT-LOR-882-A', '2027-05-30', 25, 25, 1.90, 1),
+(106, 'LT-PAR-301-A', '2027-07-10', 40, 40, 1.75, 1),
+-- BEBÉ
+(107, 'LT-EVE-009-A', NULL, 15, 15, 3.80, 2),
+(108, 'LT-EVE-004-A', NULL, 12, 12, 3.10, 2),
+(109, 'LT-MAM-002-A', NULL, 20, 20, 1.50, 2),
+(110, 'LT-CHU-001-A', NULL, 14, 14, 1.20, 2),
+(111, 'LT-CEP-001-A', NULL, 10, 10, 1.80, 2),
+-- ANALGÉSICOS
+(112, 'LT-MK-8891-A', '2028-01-15', 50, 50, 2.10, 1),
+(113, 'LT-ASP-990-A', '2026-12-31', 45, 45, 3.00, 1),
+(114, 'LT-IBU-441-A', '2027-09-30', 30, 30, 2.50, 1),
+(115, 'LT-SUE-401-A', '2026-11-15', 60, 60, 0.90, 1),
+-- PRIMEROS AUXILIOS
+(116, 'LT-JAL-7712-A', '2028-06-30', 30, 30, 1.10, 3),
+(117, 'LT-JAL-221-A', '2028-03-15', 25, 25, 0.85, 3),
+(118, 'LT-GAS-010-A', NULL, 80, 80, 0.40, 3),
+-- HIGIENE
+(119, 'LT-JOH-200-A', NULL, 18, 18, 2.20, 2),
+(120, 'LT-COL-991-A', '2027-04-30', 35, 35, 1.30, 1);
 
 -- =============================================
 -- CLIENTES (fac)
