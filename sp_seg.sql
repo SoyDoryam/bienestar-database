@@ -1015,8 +1015,8 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION inv.f_lotes_insert(
     p_id_producto INTEGER,
     p_numero_lote VARCHAR(50),
-    p_fecha_vencimiento DATE DEFAULT NULL,
     p_cantidad_entrada INTEGER,
+    p_fecha_vencimiento DATE DEFAULT NULL,
     p_precio_compra NUMERIC(18,2) DEFAULT 0,
     p_id_proveedor INTEGER DEFAULT NULL,
     p_simulate BOOLEAN DEFAULT false
